@@ -2,6 +2,7 @@
 
 #include "Win11Compat.h"
 #include <BlackBone/Process/Process.h>
+#include <Psapi.h>
 #include <vector>
 
 class CallStackSpoofer
@@ -114,13 +115,11 @@ public:
         std::vector<blackbone::ptr_t> callStack;
 
 #ifdef _WIN64
-        blackbone::ptr_t rsp = 0;
-        blackbone::ptr_t rbp = 0;
+        CONTEXT ctx = { 0 };
+        ctx.ContextFlags = CONTEXT_CONTROL;
+        RtlCaptureContext( &ctx );
 
-        __asm {
-            mov rsp, rsp
-            mov rbp, rbp
-        }
+        blackbone::ptr_t rsp = ctx.Rsp;
 
         for (int i = 0; i < 64; i++)
         {
@@ -138,11 +137,9 @@ public:
         }
 #else
         uint32_t esp = 0;
-        uint32_t ebp = 0;
 
         __asm {
             mov esp, esp
-            mov ebp, ebp
         }
 
         for (int i = 0; i < 64; i++)

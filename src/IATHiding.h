@@ -32,7 +32,9 @@ public:
         if (!mod)
             return STATUS_NOT_FOUND;
 
-        if (!NT_SUCCESS( process.memory().Read( moduleBase, mod->size, buffer ) ))
+        buffer.resize( mod->size );
+
+        if (!NT_SUCCESS( process.memory().Read( moduleBase, mod->size, buffer.data() ) ))
             return STATUS_MEMORY_NOT_ALLOCATED;
 
         if (img.Parse( buffer.data(), buffer.size(), true ) != STATUS_SUCCESS)
@@ -72,7 +74,9 @@ public:
         if (!mod)
             return STATUS_NOT_FOUND;
 
-        if (!NT_SUCCESS( process.memory().Read( moduleBase, mod->size, buffer ) ))
+        buffer.resize( mod->size );
+
+        if (!NT_SUCCESS( process.memory().Read( moduleBase, mod->size, buffer.data() ) ))
             return STATUS_MEMORY_NOT_ALLOCATED;
 
         if (img.Parse( buffer.data(), buffer.size(), true ) != STATUS_SUCCESS)
@@ -109,7 +113,9 @@ public:
         if (!mod)
             return STATUS_NOT_FOUND;
 
-        if (!NT_SUCCESS( process.memory().Read( moduleBase, mod->size, buffer ) ))
+        buffer.resize( mod->size );
+
+        if (!NT_SUCCESS( process.memory().Read( moduleBase, mod->size, buffer.data() ) ))
             return STATUS_MEMORY_NOT_ALLOCATED;
 
         if (img.Parse( buffer.data(), buffer.size(), true ) != STATUS_SUCCESS)

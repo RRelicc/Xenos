@@ -90,10 +90,10 @@ private:
     static NTSTATUS UnlinkFromPEB64( blackbone::Process& process, uint64_t moduleBase )
     {
         blackbone::_PEB64 peb = { 0 };
-        NTSTATUS status = process.core().peb64( &peb );
+        auto pebAddr = process.core().peb64( &peb );
 
-        if (!NT_SUCCESS( status ))
-            return status;
+        if (!pebAddr)
+            return STATUS_UNSUCCESSFUL;
 
         return STATUS_SUCCESS;
     }
