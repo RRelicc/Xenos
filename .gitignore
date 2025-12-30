@@ -1,0 +1,89 @@
+#OS junk files
+[Tt]humbs.db
+*.DS_Store
+
+#Visual Studio files
+*.[Oo]bj
+*.user
+*.aps
+*.pch
+*.vspscc
+*.vssscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.bak
+*.[Cc]ache
+*.ilk
+*.log
+*.tlog
+*.pdb
+*.cer
+*.lib
+*.sbr
+*.sdf
+*.opensdf
+*.unsuccessfulbuild
+*.lastbuildstate
+*.vs
+ipch/
+obj/
+cmake/
+[Bb]in
+[Dd]ebug*/
+[Rr]elease*/
+Ankh.NoLoad
+
+#MonoDevelop
+*.pidb
+*.userprefs
+
+#Tooling
+_ReSharper*/
+*.resharper
+[Tt]est[Rr]esult*
+*.sass-cache
+
+#Project files
+[Bb]uild/
+
+#Subversion files
+.svn
+
+# Office Temp Files
+~$*
+
+#NuGet
+packages/
+
+#ncrunch
+*ncrunch*
+*crunch*.local.xml
+
+# visual studio database projects
+*.dbmdl
+
+#Test files
+*.testsettings
+
+#Generated libraries
+*.dll
+*.bin
+*.sys
+
+# Allow BlackBone driver files
+!ext/blackbone/src/BlackBoneDrv/bin/**/*.sys
+
+# Allow BeaEngine libraries
+!ext/blackbone/src/3rd_party/BeaEngine/**/*.lib
+!ext/blackbone/src/3rd_party/BeaEngine/**/*.dll
+
+#and files
+GeneratedFiles*/
+
+*.ggpk
+*.idb
+*.db
