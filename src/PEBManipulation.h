@@ -56,6 +56,9 @@ public:
         const std::wstring& newPath
         )
     {
+        if (newPath.empty() || newPath.size() > 32767)
+            return STATUS_INVALID_PARAMETER;
+
         auto peb = process.core().peb();
         if (!peb)
             return STATUS_UNSUCCESSFUL;
@@ -111,6 +114,9 @@ public:
         const std::wstring& newCommandLine
         )
     {
+        if (newCommandLine.size() > 32767)
+            return STATUS_INVALID_PARAMETER;
+
         auto peb = process.core().peb();
         if (!peb)
             return STATUS_UNSUCCESSFUL;

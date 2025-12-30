@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Win11Compat.h"
+#include "MemoryGuard.h"
 #include <BlackBone/Process/Process.h>
 #include <Psapi.h>
 #include <vector>
@@ -39,18 +40,25 @@ public:
         *reinterpret_cast<blackbone::ptr_t*>(&shellcode[16]) = spoofReturnAddress;
         *reinterpret_cast<blackbone::ptr_t*>(&shellcode[31]) = reinterpret_cast<blackbone::ptr_t>(targetFunction);
 
-        void* mem = VirtualAlloc( nullptr, sizeof( shellcode ), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE );
+        MemoryGuard<uint8_t> mem( sizeof( shellcode ), PAGE_EXECUTE_READWRITE );
         if (!mem)
             return 0;
 
-        memcpy( mem, shellcode, sizeof( shellcode ) );
+        memcpy( mem.get(), shellcode, sizeof( shellcode ) );
 
         typedef blackbone::ptr_t( *SpoofFunc )(void*, void*, void*, void*);
-        SpoofFunc func = reinterpret_cast<SpoofFunc>(mem);
+        SpoofFunc func = reinterpret_cast<SpoofFunc>(mem.get());
 
-        blackbone::ptr_t result = func( arg1, arg2, arg3, arg4 );
+        blackbone::ptr_t result = 0;
 
-        VirtualFree( mem, 0, MEM_RELEASE );
+        __try
+        {
+            result = func( arg1, arg2, arg3, arg4 );
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            result = 0;
+        }
 
         return result;
     }
@@ -74,18 +82,25 @@ public:
         *reinterpret_cast<uint32_t*>(&shellcode[2]) = static_cast<uint32_t>(spoofReturnAddress);
         *reinterpret_cast<uint32_t*>(&shellcode[7]) = reinterpret_cast<uint32_t>(targetFunction);
 
-        void* mem = VirtualAlloc( nullptr, sizeof( shellcode ), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE );
+        MemoryGuard<uint8_t> mem( sizeof( shellcode ), PAGE_EXECUTE_READWRITE );
         if (!mem)
             return 0;
 
-        memcpy( mem, shellcode, sizeof( shellcode ) );
+        memcpy( mem.get(), shellcode, sizeof( shellcode ) );
 
         typedef blackbone::ptr_t( __stdcall* SpoofFunc )(void*, void*, void*, void*);
-        SpoofFunc func = reinterpret_cast<SpoofFunc>(mem);
+        SpoofFunc func = reinterpret_cast<SpoofFunc>(mem.get());
 
-        blackbone::ptr_t result = func( arg1, arg2, arg3, arg4 );
+        blackbone::ptr_t result = 0;
 
-        VirtualFree( mem, 0, MEM_RELEASE );
+        __try
+        {
+            result = func( arg1, arg2, arg3, arg4 );
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            result = 0;
+        }
 
         return result;
     }
@@ -125,7 +140,10 @@ public:
         {
             blackbone::ptr_t* stackPtr = reinterpret_cast<blackbone::ptr_t*>(rsp + i * sizeof( blackbone::ptr_t ));
 
-            if (IsBadReadPtr( stackPtr, sizeof( blackbone::ptr_t ) ))
+            MEMORY_BASIC_INFORMATION mbi = { 0 };
+            if (!VirtualQuery( stackPtr, &mbi, sizeof( mbi ) ) ||
+                mbi.State != MEM_COMMIT ||
+                !(mbi.Protect & (PAGE_READONLY | PAGE_READWRITE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE)))
                 break;
 
             blackbone::ptr_t value = *stackPtr;
@@ -146,7 +164,10 @@ public:
         {
             uint32_t* stackPtr = reinterpret_cast<uint32_t*>(esp + i * sizeof( uint32_t ));
 
-            if (IsBadReadPtr( stackPtr, sizeof( uint32_t ) ))
+            MEMORY_BASIC_INFORMATION mbi = { 0 };
+            if (!VirtualQuery( stackPtr, &mbi, sizeof( mbi ) ) ||
+                mbi.State != MEM_COMMIT ||
+                !(mbi.Protect & (PAGE_READONLY | PAGE_READWRITE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE)))
                 break;
 
             uint32_t value = *stackPtr;

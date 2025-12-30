@@ -249,6 +249,7 @@
     <ClInclude Include="ManualMapEx.h" />
     <ClInclude Include="MemoryArtifactCleaner.h" />
     <ClInclude Include="MemoryEx.h" />
+    <ClInclude Include="MemoryGuard.h" />
     <ClInclude Include="MemoryProtection.h" />
     <ClInclude Include="Message.hpp" />
     <ClInclude Include="ModuleCloaking.h" />

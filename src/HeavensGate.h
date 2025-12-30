@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Win11Compat.h"
+#include "MemoryGuard.h"
 #include <BlackBone/Process/Process.h>
 
 class HeavensGate
@@ -51,24 +52,31 @@ public:
             0xC3                                // ret
         };
 
-        void* mem = VirtualAlloc( nullptr, sizeof( code ), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE );
+        MemoryGuard<uint8_t> mem( sizeof( code ), PAGE_EXECUTE_READWRITE );
         if (!mem)
-            return 0;
+            return STATUS_MEMORY_NOT_ALLOCATED;
 
-        memcpy( mem, code, sizeof( code ) );
+        memcpy( mem.get(), code, sizeof( code ) );
 
         typedef NTSTATUS( __stdcall* SyscallFunc )(DWORD, PVOID, PVOID, PVOID, PVOID);
-        SyscallFunc func = reinterpret_cast<SyscallFunc>(mem);
+        SyscallFunc func = reinterpret_cast<SyscallFunc>(mem.get());
 
-        NTSTATUS result = func(
-            syscallNumber,
-            reinterpret_cast<PVOID>(arg1),
-            reinterpret_cast<PVOID>(arg2),
-            reinterpret_cast<PVOID>(arg3),
-            reinterpret_cast<PVOID>(arg4)
-        );
+        NTSTATUS result = STATUS_UNSUCCESSFUL;
 
-        VirtualFree( mem, 0, MEM_RELEASE );
+        __try
+        {
+            result = func(
+                syscallNumber,
+                reinterpret_cast<PVOID>(arg1),
+                reinterpret_cast<PVOID>(arg2),
+                reinterpret_cast<PVOID>(arg3),
+                reinterpret_cast<PVOID>(arg4)
+            );
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            result = STATUS_ACCESS_VIOLATION;
+        }
 
         return result;
 #endif
@@ -182,35 +190,42 @@ public:
             0xC3
         };
 
-        void* mem = VirtualAlloc( nullptr, sizeof( code ), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE );
+        MemoryGuard<uint8_t> mem( sizeof( code ), PAGE_EXECUTE_READWRITE );
         if (!mem)
             return STATUS_MEMORY_NOT_ALLOCATED;
 
-        memcpy( mem, code, sizeof( code ) );
+        memcpy( mem.get(), code, sizeof( code ) );
 
         typedef NTSTATUS( __stdcall* NtCreateThreadExFunc )(
             DWORD, PHANDLE, ACCESS_MASK, POBJECT_ATTRIBUTES, HANDLE,
             PVOID, PVOID, ULONG, SIZE_T, SIZE_T, SIZE_T, PVOID
             );
 
-        NtCreateThreadExFunc func = reinterpret_cast<NtCreateThreadExFunc>(mem);
+        NtCreateThreadExFunc func = reinterpret_cast<NtCreateThreadExFunc>(mem.get());
 
-        NTSTATUS result = func(
-            syscallNumber,
-            ThreadHandle,
-            DesiredAccess,
-            ObjectAttributes,
-            ProcessHandle,
-            StartRoutine,
-            Argument,
-            CreateFlags,
-            ZeroBits,
-            StackSize,
-            MaximumStackSize,
-            AttributeList
-        );
+        NTSTATUS result = STATUS_UNSUCCESSFUL;
 
-        VirtualFree( mem, 0, MEM_RELEASE );
+        __try
+        {
+            result = func(
+                syscallNumber,
+                ThreadHandle,
+                DesiredAccess,
+                ObjectAttributes,
+                ProcessHandle,
+                StartRoutine,
+                Argument,
+                CreateFlags,
+                ZeroBits,
+                StackSize,
+                MaximumStackSize,
+                AttributeList
+            );
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            result = STATUS_ACCESS_VIOLATION;
+        }
 
         return result;
 #endif
