@@ -54,6 +54,18 @@ Stealth and evasion:
 - PE header wiping after injection
 - Memory artifact cleaning and pattern removal
 - DKOM (Direct Kernel Object Manipulation) via driver
+- Process ghosting injection for Windows 10/11
+- TLS callback manipulation and spoofing
+- Thread name spoofing with legitimate names
+
+Security and modern C++:
+- RAII wrappers for automatic resource management (HandleGuard, MemoryGuard)
+- Result<T> type for unified error handling
+- Cryptographically secure random generation (BCryptGenRandom)
+- Buffer overflow protection and bounds checking
+- Smart pointers (std::unique_ptr) replacing manual memory management
+- Optimized data structures (std::unordered_set for O(1) lookups)
+- Chunked pattern search for large modules (50MB+ support)
 
 Supported OS: Win7 - Win11 x64
 
