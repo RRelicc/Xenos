@@ -2,6 +2,7 @@
 
 #include "Win11Compat.h"
 #include "RetryHelper.h"
+#include "HandleGuard.h"
 #include <BlackBone/Process/Process.h>
 #include <string>
 #include <vector>
@@ -104,21 +105,17 @@ public:
         DWORD dwSize = 0;
         GetTokenInformation( hToken, TokenIntegrityLevel, nullptr, 0, &dwSize );
 
-        auto pTIL = reinterpret_cast<PTOKEN_MANDATORY_LABEL>(malloc( dwSize ));
-        if (!pTIL)
-        {
-            CloseHandle( hToken );
-            return 0;
-        }
+        std::vector<uint8_t> buffer( dwSize );
+        auto pTIL = reinterpret_cast<PTOKEN_MANDATORY_LABEL>(buffer.data());
 
         DWORD integrityLevel = 0;
         if (GetTokenInformation( hToken, TokenIntegrityLevel, pTIL, dwSize, &dwSize ))
         {
             DWORD sidSubAuthCount = *GetSidSubAuthorityCount( pTIL->Label.Sid );
-            integrityLevel = *GetSidSubAuthority( pTIL->Label.Sid, sidSubAuthCount - 1 );
+            if (sidSubAuthCount > 0)
+                integrityLevel = *GetSidSubAuthority( pTIL->Label.Sid, sidSubAuthCount - 1 );
         }
 
-        free( pTIL );
         CloseHandle( hToken );
         return integrityLevel;
     }

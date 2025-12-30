@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <functional>
+#include <memory>
 
 class LocalHookEx
 {
@@ -16,6 +17,7 @@ public:
         void* trampoline = nullptr;
         std::string name;
         bool active = false;
+        std::unique_ptr<blackbone::DetourBase> detour;
     };
 
     static NTSTATUS InstallHook(
@@ -25,7 +27,7 @@ public:
         const std::string& name = ""
         )
     {
-        blackbone::DetourBase* detour = new blackbone::DetourBase();
+        auto detour = std::make_unique<blackbone::DetourBase>();
 
         NTSTATUS status = detour->Hook(
             reinterpret_cast<blackbone::ptr_t>(targetFunc),
@@ -42,8 +44,9 @@ public:
             info.trampoline = trampoline;
             info.name = name;
             info.active = true;
+            info.detour = std::move( detour );
 
-            _hooks.push_back( info );
+            _hooks.push_back( std::move( info ) );
         }
 
         return status;

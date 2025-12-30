@@ -234,6 +234,7 @@
     <ClInclude Include="EditBox.hpp" />
     <ClInclude Include="ErrorReporter.h" />
     <ClInclude Include="FileUtil.h" />
+    <ClInclude Include="HandleGuard.h" />
     <ClInclude Include="HeavensGate.h" />
     <ClInclude Include="HookEvasion.h" />
     <ClInclude Include="IATHiding.h" />
@@ -263,6 +264,7 @@
     <ClInclude Include="PerformanceMonitor.h" />
     <ClInclude Include="PPLBypass.h" />
     <ClInclude Include="ProcessEx.h" />
+    <ClInclude Include="ProcessGhosting.h" />
     <ClInclude Include="ProcessGuard.h" />
     <ClInclude Include="ProcessProtection.h" />
     <ClInclude Include="ProcessWatcher.h" />
@@ -270,6 +272,7 @@
     <ClInclude Include="ReflectiveLoader.h" />
     <ClInclude Include="RemoteExecEx.h" />
     <ClInclude Include="RemoteHookEx.h" />
+    <ClInclude Include="Result.h" />
     <ClInclude Include="RetryHelper.h" />
     <ClInclude Include="SecurityBypass.h" />
     <ClInclude Include="StackSpoofer.h" />
@@ -277,6 +280,8 @@
     <ClInclude Include="SyscallResolver.h" />
     <ClInclude Include="ThreadEx.h" />
     <ClInclude Include="ThreadHijacking.h" />
+    <ClInclude Include="ThreadNamingSpoofing.h" />
+    <ClInclude Include="TLSCallbackSpoofing.h" />
     <ClInclude Include="Win11Compat.h" />
     <ClInclude Include="rapidxml\rapidxml.hpp" />
     <ClInclude Include="rapidxml\rapidxml_iterators.hpp" />

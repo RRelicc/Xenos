@@ -33,6 +33,26 @@ public:
         bool isMemoryIntegrityEnabled;
     };
 
+private:
+    static bool GetOSVersionInfo( RTL_OSVERSIONINFOW& osvi )
+    {
+        typedef NTSTATUS(NTAPI* pfnRtlGetVersion)(PRTL_OSVERSIONINFOW);
+
+        HMODULE hNtdll = GetModuleHandleW(L"ntdll.dll");
+        if (!hNtdll)
+            return false;
+
+        auto pRtlGetVersion = reinterpret_cast<pfnRtlGetVersion>(
+            GetProcAddress(hNtdll, "RtlGetVersion"));
+
+        if (!pRtlGetVersion)
+            return false;
+
+        osvi.dwOSVersionInfoSize = sizeof(osvi);
+        return pRtlGetVersion(&osvi) == 0;
+    }
+
+public:
     static WindowsVersion GetWindowsVersion()
     {
         static WindowsVersion cachedVersion = WindowsVersion::Unknown;
@@ -40,22 +60,8 @@ public:
         if (cachedVersion != WindowsVersion::Unknown)
             return cachedVersion;
 
-        typedef NTSTATUS(NTAPI* pfnRtlGetVersion)(PRTL_OSVERSIONINFOW);
-
-        HMODULE hNtdll = GetModuleHandleW(L"ntdll.dll");
-        if (!hNtdll)
-            return WindowsVersion::Unknown;
-
-        auto pRtlGetVersion = reinterpret_cast<pfnRtlGetVersion>(
-            GetProcAddress(hNtdll, "RtlGetVersion"));
-
-        if (!pRtlGetVersion)
-            return WindowsVersion::Unknown;
-
         RTL_OSVERSIONINFOW osvi = { 0 };
-        osvi.dwOSVersionInfoSize = sizeof(osvi);
-
-        if (pRtlGetVersion(&osvi) != 0)
+        if (!GetOSVersionInfo( osvi ))
             return WindowsVersion::Unknown;
 
         if (osvi.dwMajorVersion == 10 && osvi.dwMinorVersion == 0)
@@ -80,22 +86,8 @@ public:
 
     static DWORD GetBuildNumber()
     {
-        typedef NTSTATUS(NTAPI* pfnRtlGetVersion)(PRTL_OSVERSIONINFOW);
-
-        HMODULE hNtdll = GetModuleHandleW(L"ntdll.dll");
-        if (!hNtdll)
-            return 0;
-
-        auto pRtlGetVersion = reinterpret_cast<pfnRtlGetVersion>(
-            GetProcAddress(hNtdll, "RtlGetVersion"));
-
-        if (!pRtlGetVersion)
-            return 0;
-
         RTL_OSVERSIONINFOW osvi = { 0 };
-        osvi.dwOSVersionInfoSize = sizeof(osvi);
-
-        if (pRtlGetVersion(&osvi) != 0)
+        if (!GetOSVersionInfo( osvi ))
             return 0;
 
         return osvi.dwBuildNumber;

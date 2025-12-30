@@ -1,8 +1,11 @@
 #pragma once
 
 #include <Windows.h>
+#include <bcrypt.h>
 #include "Win11Compat.h"
 #include <BlackBone/Process/Process.h>
+
+#pragma comment(lib, "bcrypt.lib")
 
 class ModuleCloaking
 {
@@ -72,8 +75,12 @@ public:
             if (!NT_SUCCESS( status ))
                 continue;
 
-            for (int j = 0; j < IMAGE_SIZEOF_SHORT_NAME; j++)
-                section.Name[j] = 'A' + (rand() % 26);
+            uint8_t randomBytes[IMAGE_SIZEOF_SHORT_NAME];
+            if (NT_SUCCESS( BCryptGenRandom( nullptr, randomBytes, sizeof( randomBytes ), BCRYPT_USE_SYSTEM_PREFERRED_RNG ) ))
+            {
+                for (int j = 0; j < IMAGE_SIZEOF_SHORT_NAME; j++)
+                    section.Name[j] = 'A' + (randomBytes[j] % 26);
+            }
 
             process.memory().Write( sectionHeaderAddr + i * sizeof( section ), sizeof( section ), &section );
         }

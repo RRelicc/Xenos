@@ -30,11 +30,31 @@ public:
         if (!mod)
             return results;
 
+        const size_t maxChunkSize = 50 * 1024 * 1024;
+
         blackbone::PatternSearch searcher( pattern );
         std::vector<blackbone::ptr_t> found;
 
-        process.memory().Read( mod->baseAddress, mod->size, _buffer );
-        searcher.SearchRemote( process, pattern, mod->baseAddress, mod->size, found, firstOnly ? 1 : 0 );
+        if (mod->size > maxChunkSize)
+        {
+            size_t offset = 0;
+            while (offset < mod->size)
+            {
+                size_t chunkSize = (std::min)( maxChunkSize, mod->size - offset );
+
+                searcher.SearchRemote( process, pattern, mod->baseAddress + offset, chunkSize, found, firstOnly ? 1 : 0 );
+
+                if (firstOnly && !found.empty())
+                    break;
+
+                offset += chunkSize;
+            }
+        }
+        else
+        {
+            process.memory().Read( mod->baseAddress, mod->size, _buffer );
+            searcher.SearchRemote( process, pattern, mod->baseAddress, mod->size, found, firstOnly ? 1 : 0 );
+        }
 
         for (const auto& addr : found)
         {
@@ -43,7 +63,7 @@ public:
             result.offset = addr - mod->baseAddress;
             result.moduleName = moduleName;
             result.valid = true;
-            results.push_back( result );
+            results.emplace_back( result );
         }
 
         return results;
@@ -106,6 +126,9 @@ public:
         std::vector<uint8_t> buffer( mod->size );
         if (NT_SUCCESS( process.memory().Read( mod->baseAddress, mod->size, buffer.data() ) ))
         {
+            if (buffer.size() < signature.size())
+                return results;
+
             for (size_t i = 0; i <= buffer.size() - signature.size(); ++i)
             {
                 bool found = true;

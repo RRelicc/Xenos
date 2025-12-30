@@ -5,6 +5,7 @@
 #include <functional>
 #include <thread>
 #include <atomic>
+#include <unordered_set>
 #include <BlackBone/Process/Process.h>
 
 class ProcessWatcher
@@ -60,6 +61,10 @@ private:
     void WatchThreadProc()
     {
         auto initialProcs = blackbone::Process::EnumByNameOrPID( 0, _processName ).result( std::vector<blackbone::ProcessInfo>() );
+        std::unordered_set<DWORD> seenPids;
+
+        for (const auto& proc : initialProcs)
+            seenPids.insert( proc.pid );
 
         HANDLE notifyHandle = nullptr;
         if (RegisterProcessNotification( &notifyHandle ))
@@ -79,22 +84,19 @@ private:
 
                     for (const auto& proc : currentProcs)
                     {
-                        bool isNew = std::find_if( initialProcs.begin(), initialProcs.end(),
-                            [&]( const blackbone::ProcessInfo& p ) { return p.pid == proc.pid; } ) == initialProcs.end();
-
-                        if (isNew)
+                        if (seenPids.find( proc.pid ) == seenPids.end())
                         {
                             if (_skipped < _skipCount)
                             {
                                 _skipped++;
-                                initialProcs.push_back( proc );
+                                seenPids.insert( proc.pid );
                                 continue;
                             }
 
                             if (_callback)
                                 _callback( proc.pid, proc.imageName );
 
-                            initialProcs = currentProcs;
+                            seenPids.insert( proc.pid );
                         }
                     }
                 }

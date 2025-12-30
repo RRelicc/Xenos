@@ -7,6 +7,7 @@
 #include <BlackBone/PE/PEImage.h>
 #include <vector>
 #include <string>
+#include <optional>
 
 class ModuleEx
 {
@@ -33,7 +34,7 @@ public:
         process.modules().Refresh();
 
         for (auto& mod : process.modules().GetAllModules())
-            modules.push_back( mod.second );
+            modules.emplace_back( mod.second );
 
         return modules;
     }
@@ -49,7 +50,7 @@ public:
         for (auto& mod : allModules)
         {
             if (mod->name.find( namePattern ) != std::wstring::npos)
-                matches.push_back( mod );
+                matches.emplace_back( mod );
         }
 
         return matches;

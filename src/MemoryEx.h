@@ -287,6 +287,9 @@ public:
                 region.RegionSize,
                 buffer.data() ) ))
             {
+                if (buffer.size() < pattern.size())
+                    continue;
+
                 for (size_t i = 0; i <= buffer.size() - pattern.size(); ++i)
                 {
                     bool found = true;

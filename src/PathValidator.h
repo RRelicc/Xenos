@@ -46,6 +46,9 @@ public:
 
     static std::wstring NormalizePath( const std::wstring& path )
     {
+        if (path.length() >= MAX_PATH)
+            return path;
+
         wchar_t normalized[MAX_PATH] = { 0 };
 
         if (PathCanonicalizeW( normalized, path.c_str() ))
@@ -101,6 +104,9 @@ public:
 
     static std::wstring GetAbsolutePath( const std::wstring& path )
     {
+        if (path.length() >= MAX_PATH)
+            return path;
+
         wchar_t fullPath[MAX_PATH] = { 0 };
 
         if (GetFullPathNameW( path.c_str(), MAX_PATH, fullPath, nullptr ))
