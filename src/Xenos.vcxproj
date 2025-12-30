@@ -218,6 +218,7 @@
   <ItemGroup>
     <ClInclude Include="AntiDebug.h" />
     <ClInclude Include="Button.hpp" />
+    <ClInclude Include="CallStackSpoofer.h" />
     <ClInclude Include="CallstackWalker.h" />
     <ClInclude Include="ComboBox.hpp" />
     <ClInclude Include="ConfigManager.h" />
@@ -226,13 +227,16 @@
     <ClInclude Include="DlgModules.h" />
     <ClInclude Include="DlgSettings.h" />
     <ClInclude Include="DlgWait.h" />
+    <ClInclude Include="DKOM.h" />
     <ClInclude Include="DriverEx.h" />
     <ClInclude Include="DriverExtract.h" />
     <ClInclude Include="DumpHandler.h" />
     <ClInclude Include="EditBox.hpp" />
     <ClInclude Include="ErrorReporter.h" />
     <ClInclude Include="FileUtil.h" />
+    <ClInclude Include="HeavensGate.h" />
     <ClInclude Include="HookEvasion.h" />
+    <ClInclude Include="IATHiding.h" />
     <ClInclude Include="InjectionCore.h" />
     <ClInclude Include="InjectionEx.h" />
     <ClInclude Include="InjectionMonitor.h" />
@@ -243,6 +247,7 @@
     <ClInclude Include="LocalHookEx.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="ManualMapEx.h" />
+    <ClInclude Include="MemoryArtifactCleaner.h" />
     <ClInclude Include="MemoryEx.h" />
     <ClInclude Include="MemoryProtection.h" />
     <ClInclude Include="Message.hpp" />
@@ -250,7 +255,9 @@
     <ClInclude Include="ModuleEx.h" />
     <ClInclude Include="PathValidator.h" />
     <ClInclude Include="PatternSearchEx.h" />
+    <ClInclude Include="PEBManipulation.h" />
     <ClInclude Include="PEEx.h" />
+    <ClInclude Include="PEHeaderWiper.h" />
     <ClInclude Include="PEValidator.h" />
     <ClInclude Include="PerformanceMonitor.h" />
     <ClInclude Include="PPLBypass.h" />
