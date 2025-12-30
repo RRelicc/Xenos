@@ -46,6 +46,15 @@ Extended functionality:
 - Retry logic for stability on protected processes
 - Performance monitoring and error reporting
 
+Stealth and evasion:
+- IAT (Import Address Table) hiding and redirection
+- PEB manipulation to hide modules and spoof process information
+- Call stack spoofing with ROP gadgets
+- Heaven's Gate technique for WoW64 syscalls
+- PE header wiping after injection
+- Memory artifact cleaning and pattern removal
+- DKOM (Direct Kernel Object Manipulation) via driver
+
 Supported OS: Win7 - Win11 x64
 
 ## License ##
